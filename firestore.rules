@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == 'dormstaff2009@gmail.com';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidFiscalYear(data) {
+      return data.keys().hasAll(['year', 'allocatedBudget', 'userId'])
+        && data.keys().hasOnly(['year', 'allocatedBudget', 'description', 'categoryBudgets', 'userId', 'createdAt', 'updatedAt'])
+        && data.year is string && data.year.size() > 0 && data.year.size() <= 10
+        && data.allocatedBudget is number && data.allocatedBudget >= 0
+        && (!('description' in data) || (data.description is string && data.description.size() <= 250))
+        && (!('categoryBudgets' in data) || data.categoryBudgets is map)
+        && data.userId is string && data.userId == request.auth.uid
+        && (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50))
+        && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
+    function isValidExpense(data) {
+      return data.keys().hasAll(['fiscalYear', 'type', 'category', 'description', 'amount', 'date', 'userId'])
+        && data.keys().hasOnly(['fiscalYear', 'type', 'category', 'description', 'amount', 'date', 'note', 'userId', 'createdAt', 'updatedAt'])
+        && data.fiscalYear is string && data.fiscalYear.size() > 0 && data.fiscalYear.size() <= 10
+        && data.type is string && data.type.size() > 0 && data.type.size() <= 100
+        && data.category is string && data.category.size() > 0 && data.category.size() <= 150
+        && data.description is string && data.description.size() > 0 && data.description.size() <= 500
+        && data.amount is number && data.amount >= 0
+        && data.date is string && data.date.size() > 0 && data.date.size() <= 20
+        && (!('note' in data) || (data.note is string && data.note.size() <= 500))
+        && data.userId is string && data.userId == request.auth.uid
+        && (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50))
+        && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
+    match /fiscal_years/{fiscalYearId} {
+      allow get: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidId(fiscalYearId) && isValidFiscalYear(incoming());
+      allow update: if isSignedIn() && isValidId(fiscalYearId) && (existing().userId == request.auth.uid || isAdmin())
+                    && incoming().userId == existing().userId && isValidFiscalYear(incoming());
+      allow delete: if isSignedIn() && isValidId(fiscalYearId) && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    match /expenses/{expenseId} {
+      allow get: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidId(expenseId) && isValidExpense(incoming());
+      allow update: if isSignedIn() && isValidId(expenseId) && (existing().userId == request.auth.uid || isAdmin())
+                    && incoming().userId == existing().userId && isValidExpense(incoming());
+      allow delete: if isSignedIn() && isValidId(expenseId) && (existing().userId == request.auth.uid || isAdmin());
+    }
+  }
+}

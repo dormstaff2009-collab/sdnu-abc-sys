@@ -1,0 +1,108 @@
+{
+  "entities": {
+    "FiscalYear": {
+      "title": "FiscalYear",
+      "description": "Represents an annual fiscal year and allocated budget for personnel dormitory expenses",
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": "string",
+          "description": "Thai fiscal year e.g. 2567, 2568, 2569",
+          "maxLength": 10
+        },
+        "allocatedBudget": {
+          "type": "number",
+          "description": "Total allocated budget in Thai Baht for this fiscal year"
+        },
+        "description": {
+          "type": "string",
+          "description": "Short description or title of the annual fiscal budget",
+          "maxLength": 250
+        },
+        "categoryBudgets": {
+          "type": "object",
+          "description": "Allocated budget in Thai Baht mapped by category name"
+        },
+        "userId": {
+          "type": "string",
+          "description": "User ID of the staff member who created this record",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["year", "allocatedBudget", "userId"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Represents a dormitory budget expense entry",
+      "type": "object",
+      "properties": {
+        "fiscalYear": {
+          "type": "string",
+          "description": "Thai fiscal year this expense belongs to",
+          "maxLength": 10
+        },
+        "type": {
+          "type": "string",
+          "description": "Main category: ค่าจ้างชั่วคราว, ค่าใช้สอยและวัสดุ, or ค่าครุภัณฑ์ที่ดินและสิ่งก่อสร้าง",
+          "maxLength": 100
+        },
+        "category": {
+          "type": "string",
+          "description": "Subcategory expenditure name e.g. จ้างเหมาบริการรักษาความปลอดภัย",
+          "maxLength": 150
+        },
+        "description": {
+          "type": "string",
+          "description": "Details of the expense item",
+          "maxLength": 500
+        },
+        "amount": {
+          "type": "number",
+          "description": "Expense amount in Thai Baht"
+        },
+        "date": {
+          "type": "string",
+          "description": "Transaction date format YYYY-MM-DD",
+          "maxLength": 20
+        },
+        "note": {
+          "type": "string",
+          "description": "Memo or notes for the expense",
+          "maxLength": 500
+        },
+        "userId": {
+          "type": "string",
+          "description": "User ID of the staff member who recorded the expense",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["fiscalYear", "type", "category", "description", "amount", "date", "userId"]
+    }
+  },
+  "firestore": {
+    "/fiscal_years/{fiscalYearId}": {
+      "schema": "FiscalYear",
+      "description": "Collection of annual budget records keyed by document ID"
+    },
+    "/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Collection of dormitory expenditure transactions"
+    }
+  }
+}

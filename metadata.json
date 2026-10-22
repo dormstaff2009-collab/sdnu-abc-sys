@@ -1,0 +1,6 @@
+{
+  "name": "Personnel Dormitory Budget Manager",
+  "description": "ระบบควบคุมงบประมาณรายจ่ายประจำปีของหอพักบุคลากร สรุปผลแยกหมวดหมู่และแผนภูมิวงกลม พร้อมระบบ Firebase",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
