@@ -21,6 +21,7 @@ import { ExpenseTable } from './components/ExpenseTable';
 import { ExpenseModal } from './components/ExpenseModal';
 import { FiscalYearModal } from './components/FiscalYearModal';
 import { PrintReportModal } from './components/PrintReportModal';
+import { AuthErrorModal } from './components/AuthErrorModal';
 import { 
   Building2, 
   Plus, 
@@ -35,7 +36,7 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle, authError, clearAuthError } = useAuth();
 
   // State
   const [fiscalYears, setFiscalYears] = useState<FiscalYear[]>([]);
@@ -442,6 +443,13 @@ export default function App() {
         expenses={expenses}
         stats={stats}
         currentYear={selectedYear}
+      />
+
+      {/* Auth Error Guidance Modal */}
+      <AuthErrorModal
+        error={authError}
+        onClose={clearAuthError}
+        onRetry={signInWithGoogle}
       />
     </div>
   );
