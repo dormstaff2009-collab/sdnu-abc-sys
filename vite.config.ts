@@ -9,6 +9,9 @@ export default defineConfig(() => {
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, '.'),
+      build: {
+        // กำหนดขีดจำกัดการเตือนเป็น 1000 kB (1 MB) หรือค่าที่คุณต้องการ
+      chunkSizeWarningLimit: 1000,
       },
     },
     server: {
@@ -20,13 +23,3 @@ export default defineConfig(() => {
     },
   };
 });
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react' // หรือ plugin อื่นๆ ที่คุณใช้งานอยู่
-
-export default defineConfig({
-  plugins: [react()],
-  build: {
-    // กำหนดขีดจำกัดการเตือนเป็น 1000 kB (1 MB) หรือค่าที่คุณต้องการ
-    chunkSizeWarningLimit: 1000, 
-  },
-})
